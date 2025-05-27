@@ -1,6 +1,7 @@
-  import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainContent from "../MainContent/MainContent.jsx";
+import CardSmall from "../CardSmall/CardSmall.jsx"; // Asegúrate de importar CardSmall
 import { getInitialData } from "../../config/initialData.js";
 
 const Profile = () => {
@@ -25,6 +26,9 @@ const Profile = () => {
       rating: "PG",
     },
   ]);
+  const [showMyList, setShowMyList] = useState(false);
+  const [myList, setMyList] = useState([]);
+  const [user, setUser] = useState({ nombre: "Usuario" }); // Por defecto, puedes cambiar esto según tu lógica de login
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +36,19 @@ const Profile = () => {
       setData(result);
     };
     fetchData();
+    // Cargar mi lista desde localStorage
+    const storedList = JSON.parse(localStorage.getItem("myList") || "[]");
+    setMyList(storedList);
+  }, []);
+
+  // Actualizar mi lista cuando se agregue o quite una película
+  useEffect(() => {
+    const onStorage = () => {
+      const storedList = JSON.parse(localStorage.getItem("myList") || "[]");
+      setMyList(storedList);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const navigate = useNavigate(); // Hook para redirigir
@@ -52,11 +69,28 @@ const Profile = () => {
 
   return (
     <div className="bg-black p-8 min-h-screen">
+      {/* Mensaje de saludo si el usuario está logueado */}
+      {user && user.nombre && (
+        <div className="mb-4 text-xl text-green-400 font-bold">
+          Hola: {user.nombre}
+        </div>
+      )}
       <header className="flex justify-between items-center mb-6 bg-black">
         <h1 className="text-3xl font-bold text-white">
           {isKidsProfile ? "Perfil Infantil" : "Tu Perfil"}
         </h1>
         <div className="flex gap-4 items-center">
+          <button
+            onClick={() => setShowMyList((prev) => !prev)}
+            className={`px-4 py-2 rounded font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 ${
+              showMyList
+                ? "bg-green-700 text-white border-2 border-green-400 hover:bg-green-800"
+                : "bg-green-500 text-white hover:bg-green-600 border-2 border-green-400"
+            }`}
+            style={{ minWidth: 120 }}
+          >
+            {showMyList ? "Ver catálogo" : "Ver mi lista"}
+          </button>
           <button
             onClick={handleSwitchProfile}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
@@ -66,7 +100,7 @@ const Profile = () => {
               : "Cambiar a Perfil Infantil"}
           </button>
           <button
-            onClick={handleLogout} // Llamar a la función handleLogout
+            onClick={handleLogout}
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
           >
             Cerrar Sesión
@@ -111,17 +145,64 @@ const Profile = () => {
         </div>
       </header>
 
-      {/* Contenido principal */}
-      <MainContent
-        cardDetails={data.cardDetails}
-        genresList={data.genresList}
-        popularByGenre={data.popularByGenre}
-        initialGenres={data.initialGenres}
-        SEARCH_API={data.SEARCH_API}
-        cardDetPop={data.cardDetPop}
-        continueWatching={continueWatching}
-        isKidsProfile={isKidsProfile} // Pasar el estado del perfil infantil
-      />
+      {/* Sección para mostrar Mi Lista */}
+      {showMyList ? (
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Mi lista</h2>
+          {myList.length === 0 ? (
+            <p className="text-gray-400">
+              No has agregado películas a tu lista.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-6 justify-center">
+              {myList.map((movie) => (
+                <div
+                  key={movie.id || movie.title}
+                  className="flex-shrink-0"
+                  style={{ width: 220 }}
+                >
+                  {/* Mostrar solo la tarjeta, no el MainContent completo */}
+                  <CardSmall
+                    {...movie}
+                    fullScreen={false}
+                    useImg={true}
+                    onAdd={(updatedList) => setMyList(updatedList)}
+                  />
+                  <button
+                    onClick={() => {
+                      const updatedList = myList.filter(
+                        (m) => m.id !== movie.id
+                      );
+                      setMyList(updatedList);
+                      localStorage.setItem(
+                        "myList",
+                        JSON.stringify(updatedList)
+                      );
+                    }}
+                    className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white py-1 px-2 rounded transition"
+                  >
+                    Quitar de mi lista
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : null}
+
+      {/* Contenido principal (catálogo) */}
+      {!showMyList && (
+        <MainContent
+          cardDetails={data.cardDetails}
+          genresList={data.genresList}
+          popularByGenre={data.popularByGenre}
+          initialGenres={data.initialGenres}
+          SEARCH_API={data.SEARCH_API}
+          cardDetPop={data.cardDetPop}
+          continueWatching={continueWatching}
+          isKidsProfile={isKidsProfile}
+        />
+      )}
     </div>
   );
 };

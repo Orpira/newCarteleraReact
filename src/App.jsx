@@ -37,18 +37,19 @@ function App(props) {
           }
         }}
       />
-      <h1 className="sr-only">Bienvenido a mi aplicación</h1>
       <MainContent {...initialData} {...props} searchTerm={searchTerm} />
       <Footer>
         &copy; {new Date().getFullYear()} Mi Sitio Web. Todos los derechos
         reservados.
       </Footer>
       <Modal isOpen={isLoginModalOpen} onClose={handleLoginClose}>
-        <Form onSubmit={(data) => {
-          // Aquí puedes manejar los datos del formulario
-          console.log('Formulario enviado:', data);
-          handleLoginClose();
-        }} />
+        <Form
+          onSubmit={(data) => {
+            // Aquí puedes manejar los datos del formulario
+            console.log("Formulario enviado:", data);
+            handleLoginClose();
+          }}
+        />
       </Modal>
     </div>
   );

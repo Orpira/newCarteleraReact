@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ButtonFavorite } from "../../../index.js";
 import { useLocation } from "react-router-dom";
 
-const Card = ({ image, title, content, onClick, fullScreen, useImg }) => {
+const CardTrending = ({ image, title, content, onClick, fullScreen, useImg }) => {
   const location = useLocation();
   const isProfilePage = location.pathname === '/profile';
   const [isFavorite, setIsFavorite] = useState(false);
@@ -63,29 +63,7 @@ const Card = ({ image, title, content, onClick, fullScreen, useImg }) => {
             : "text-lg mt-2 mb-1 truncate w-full block"
         }`}
         title={title}
-      ></h3>
-      {/* Solo mostrar el botón y el contenido en cards populares (no fullScreen) */}
-      {!fullScreen && isProfilePage && (
-        <>
-          <span className="block text-x font-bold text-center ">{title}</span>
-          <div className="flex items-center justify-between mt-2 mb-1">
-            {/* Botón de favorito a la izquierda */}
-            <ButtonFavorite isFavorite={isFavorite} onToggle={toggleFavorite} />
-
-            {/* Botón de más información a la derecha */}
-            <button
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick(); // Llama a la función pasada desde el padre (abre el modal)
-              }}
-              type="button"
-            >
-              Más información
-            </button>
-          </div>
-        </>
-      )}
+      ></h3>      
       {/* El content original solo para fullScreen */}
       {fullScreen && (
         <p className="bg-[#222] p-5 rounded-[10px] max-w-[600px] w-[90%] text-white relative z-50">
@@ -98,4 +76,4 @@ const Card = ({ image, title, content, onClick, fullScreen, useImg }) => {
   );
 };
 
-export default Card;
+export default CardTrending;

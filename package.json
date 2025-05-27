@@ -1,8 +1,8 @@
 {
-  "name": "libreriacomponentes",
+  "name": "carteleraReact",
   "private": true,
   "version": "1.0.0",
-  "homepage": "https://LILIANADAM1.github.io/carteleraReact/",
+  "homepage": "https://orpira.github.io/newCarteleraReact",
   "main": "index.js",
   "type": "module",
   "scripts": {
